@@ -91,17 +91,17 @@ public abstract class BaseFacebookWebViewActivity extends Activity implements
     // u = url & t = title
     protected final static String URL_PAGE_SHARE_LINKS = "/sharer.php?u=%s&t=%s";
 
-    // Desktop user agent (Google Chrome's user agent from a MacBook running 10.9.1
-    protected static final String USER_AGENT_DESKTOP = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_1) " +
-            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36";
-    // Mobile user agent (Mobile user agent from a Google Nexus S running Android 2.3.3
+    // Desktop user agent (Google Chrome's user agent on macOS)
+    protected static final String USER_AGENT_DESKTOP = "Mozilla/5.0 (Macintosh; Intel Mac OS X 12_4) " +
+            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36";
+    // Mobile user agent (Mobile user agent from a Google Nexus S running Android 2.3.3)
     protected static final String USER_AGENT_MOBILE_OLD = "Mozilla/5.0 (Linux; U; Android 2.3.3; en-gb; " +
             "Nexus S Build/GRI20) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1";
-    // Mobile user agent (Mobile user agent from a Google Nexus 5 running Android 4.4.2
-    protected static final String USER_AGENT_MOBILE = "Mozilla/5.0 (Linux; Android 5.0; Nexus 5 Build/LRX21O) " +
-            "AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/37.0.0.0 Mobile Safari/537.36";
+    // Mobile user agent (Google Chrome's user agent on Samsung device)
+    protected static final String USER_AGENT_MOBILE = "Mozilla/5.0 (Linux; Android 11; SM-A205U) AppleWebKit/537.36 " +
+            "(KHTML, like Gecko) Chrome/103.0.5060.70 Mobile Safari/537.36";
     // Firefox for Android user agent, it brings up a basic version of the site. Halfway between touch site and zero site.
-    protected static final String USER_AGENT_BASIC = "Mozilla/5.0 (Android; Mobile; rv:13.0) Gecko/13.0 Firefox/13.0";
+    protected static final String USER_AGENT_BASIC = "Mozilla/5.0 (Android 12; Mobile; LG-M255; rv:102.0) Gecko/102.0 Firefox/102.0";
 
     // Members
     protected ConnectivityManager mConnectivityManager = null;
