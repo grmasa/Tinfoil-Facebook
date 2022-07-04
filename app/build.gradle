@@ -2,25 +2,23 @@ apply plugin: 'com.android.application'
 
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
     }
 }
 
 android {
+    compileSdkVersion 32
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
+        minSdkVersion 24
+        targetSdkVersion 32
         versionCode 20170312
         versionName "1.7.7"
-
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
     }
 
     buildTypes {
@@ -45,9 +43,11 @@ android {
 
 }
 
-final SUPPORT_LIBRARY_VERSION = rootProject.ext.SUPPORT_LIBRARY_VERSION
 
 dependencies {
-    compile "com.android.support:support-v4:${SUPPORT_LIBRARY_VERSION}"
-    compile 'com.squareup.picasso:picasso:2.5.2'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'com.google.android.material:material:1.6.1'
+    implementation "androidx.drawerlayout:drawerlayout:1.1.1"
+    implementation 'com.squareup.picasso:picasso:2.5.2'
 }

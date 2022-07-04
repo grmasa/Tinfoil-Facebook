@@ -35,7 +35,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
@@ -239,7 +238,7 @@ public abstract class BaseFacebookWebViewActivity extends Activity implements
      * {@inheritDoc}
      */
     @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
+    protected void onSaveInstanceState(Bundle outState) {
         // Save the current time to the state bundle
         outState.putLong(KEY_SAVE_STATE_TIME, System.currentTimeMillis());
 
