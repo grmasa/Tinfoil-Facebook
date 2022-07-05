@@ -16,15 +16,18 @@
 
 package com.danvelazco.fbwrapper.activity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -40,7 +43,10 @@ import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
+import android.webkit.DownloadListener;
+import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -48,6 +54,9 @@ import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import androidx.core.app.ActivityCompat;
+
 import com.danvelazco.fbwrapper.R;
 import com.danvelazco.fbwrapper.util.Logger;
 import com.danvelazco.fbwrapper.util.OrbotHelper;
@@ -164,6 +173,15 @@ public abstract class BaseFacebookWebViewActivity extends Activity implements
         mWebView.setCustomContentView((FrameLayout) findViewById(R.id.fullscreen_custom_content));
         mWebView.setWebChromeClientListener(this);
         mWebView.setWebViewClientListener(this);
+        mWebView.setDownloadListener((url, userAgent, contentDisposition, mimetype, contentLength) -> {
+            //checking runtime permissions
+            if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+                downloadDialog(url, userAgent, contentDisposition, mimetype);
+            } else {
+                //requesting permissions
+                ActivityCompat.requestPermissions(BaseFacebookWebViewActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+            }
+        });
         mWebSettings = mWebView.getWebSettings();
 
         mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
@@ -180,6 +198,44 @@ public abstract class BaseFacebookWebViewActivity extends Activity implements
 
         // Have the activity open the proper URL
         onWebViewInit(savedInstanceState);
+    }
+
+    public void downloadDialog(final String url, final String userAgent, String contentDisposition, String mimetype) {
+        //file name
+        final String filename = URLUtil.guessFileName(url, contentDisposition, mimetype);
+        //Creates AlertDialog.
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        //title of Dialog
+        builder.setTitle("Download");
+        //Message of Dialog.
+        builder.setMessage("Do you want to save " + filename);
+        //if YES button clicks
+        builder.setPositiveButton("Yes", (dialog, which) -> {
+            //DownloadManager.Request created with url.
+            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url.trim().replace("blob:","")));
+            //cookie
+            String cookie = CookieManager.getInstance().getCookie(url);
+            //Add cookie and User-Agent to request
+            request.addRequestHeader("Cookie", cookie);
+            request.addRequestHeader("User-Agent", userAgent);
+            //file scanned by MediaScannar
+            request.allowScanningByMediaScanner();
+            //Download is visible and its progress, after completion too.
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            //DownloadManager created
+            DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+            //Saving file in Download folder
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_PICTURES, "/Facebook/"+filename);
+            //download enqued
+            downloadManager.enqueue(request);
+        });
+        //If Cancel button clicks
+        builder.setNegativeButton("Cancel", (dialog, which) -> {
+            //cancel the dialog if Cancel clicks
+            dialog.cancel();
+        });
+        //Shows alertdialog
+        builder.create().show();
     }
 
     /**
@@ -422,10 +478,8 @@ public abstract class BaseFacebookWebViewActivity extends Activity implements
      * Show a context menu to allow the user to perform actions specifically related to the link they just long pressed
      * on.
      *
-     * @param menu
-     *         {@link ContextMenu}
-     * @param url
-     *         {@link String}
+     * @param menu {@link ContextMenu}
+     * @param url  {@link String}
      */
     private void showLongPressedLinkMenu(ContextMenu menu, String url) {
         // TODO: needs to be implemented, add ability to open site with external browser
@@ -435,10 +489,8 @@ public abstract class BaseFacebookWebViewActivity extends Activity implements
      * Show a context menu to allow the user to perform actions specifically related to the image they just long pressed
      * on.
      *
-     * @param menu
-     *         {@link ContextMenu}
-     * @param imageUrl
-     *         {@link String}
+     * @param menu     {@link ContextMenu}
+     * @param imageUrl {@link String}
      */
     private void showLongPressedImageMenu(ContextMenu menu, String imageUrl) {
         mPendingImageUrlToSave = imageUrl;
@@ -667,8 +719,7 @@ public abstract class BaseFacebookWebViewActivity extends Activity implements
     /**
      * Save the image on the specified URL to disk
      *
-     * @param imageUrl
-     *         {@link String}
+     * @param imageUrl {@link String}
      */
     private void saveImageToDisk(String imageUrl) {
         if (imageUrl != null) {
