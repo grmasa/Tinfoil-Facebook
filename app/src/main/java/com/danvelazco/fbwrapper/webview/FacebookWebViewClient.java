@@ -17,6 +17,8 @@
 package com.danvelazco.fbwrapper.webview;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.view.KeyEvent;
@@ -132,7 +134,7 @@ public class FacebookWebViewClient extends WebViewClient {
         Logger.d(getClass().getSimpleName(), "This URL should be loaded by a 3rd party. Override.");
         fireOpenExternalSiteListener(url);
 
-        return true;
+        return false;
     }
 
     /**
